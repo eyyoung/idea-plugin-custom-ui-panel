@@ -4,7 +4,7 @@
 
 This plugin means to manage the Common UI preview and dependency<br/>
 We use this plugin to introduce the style and Common Widget we now suppose to use in the Android development<br/>
-Such as a button in specification style we want to use in all company,this plugin may lead to simplify the introduction work and also when our widget or style update,the dependency may also update,this plugin will auto manage the Gradle dependency<br/>
+Such as a button in specification style we want to use in all members of company,this plugin may lead to simplify the introduction work and also when our widget or style update,the dependency may also update,this plugin will auto manage the Gradle dependency<br/>
 
 A config is used in this plugin<br/>
 [Config.xml](https://github.com/eyyoung/idea-plugin-custom-ui-panel/blob/master/config.xml)<br/>
