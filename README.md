@@ -14,6 +14,11 @@ Config adress is configurable
 
 ![Plugin Preview](https://raw.githubusercontent.com/eyyoung/idea-plugin-custom-ui-panel/master/preview/preview.gif)
 
+## Config
+
+Setting the config url in the Android Studio Preference window
+![Plugin Setting](https://raw.githubusercontent.com/eyyoung/idea-plugin-custom-ui-panel/master/preview/settings.png)
+
 ## Config Sample
 
 ```xml
