@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF8"?>
 <idea-plugin>
   <id>com.nd.sdp.common.CustomUIToolWindow</id>
-  <name>ND CustomUI Tool Window</name>
+  <name>CustomUI Tool Window</name>
   <version>1.0</version>
   <vendor email="young91@vip.qq.com" url="http://git.sdp.nd/949177">SDP Common</vendor>
 
@@ -9,7 +9,7 @@
       Plugin Function<br/>
       Read Remote（Git）Config，List All Common UI Widget<br/>
       Display UI preview,UI Dependency,UI Readme<br/>
-      Updatable CommonUI,Auto import gradle node<br/>
+      Updatable UI Widget,Auto import gradle node<br/>
     ]]></description>
 
   <change-notes><![CDATA[
@@ -31,7 +31,7 @@
     <!-- Add your extensions here -->
     <applicationConfigurable groupId="tools" displayName="Custom UI Widget Panel" id="preferences.SingleFileExecutionConfigurable" instance="com.nd.sdp.common.config.CustomUIConfigurable" />
     <applicationService serviceInterface="com.nd.sdp.common.config.CustomUIConfig" serviceImplementation="com.nd.sdp.common.config.CustomUIConfig"/>
-    <toolWindow id="ND CustomUI" secondary="true" icon="/icon.png" anchor="right" factoryClass="com.nd.sdp.common.CustomUIToolWindowFactory"/>
+    <toolWindow id="CustomUI" secondary="true" icon="/icon.png" anchor="right" factoryClass="com.nd.sdp.common.CustomUIToolWindowFactory"/>
   </extensions>
 
   <actions>

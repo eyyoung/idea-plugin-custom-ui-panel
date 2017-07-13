@@ -53,6 +53,7 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
     private var infoSplitPane: JSplitPane? = null
     private var textPaneReadme: JTextPane? = null
     private var buttonDragToJava: JButton? = null
+    private var tfFeedback: JLabel? = null
     private var categoryListModel: DefaultListModel<String> = DefaultListModel()
     private val widgetMap = HashMap<String, DefaultListModel<Widget>>()
     private var mCurrentWidget: Widget? = null
@@ -69,6 +70,7 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
 //        val font = labelRepository!!.font
 //        val attributes = font.attributes
 //        labelRepository!!.font = font.deriveFont(attributes)
+        tfFeedback!!.addMouseListener(OpenUrlAction("https://github.com/eyyoung/idea-plugin-custom-ui-panel/issues"))
         labelRepository!!.cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
         listWidget!!.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(evt: MouseEvent?) {
@@ -257,16 +259,20 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
         if (splitPane == null) {
             return
         }
-        splitPane.border = BorderFactory.createEmptyBorder(1, 1, 1, 1)
-        val flatDividerSplitPaneUI = object : BasicSplitPaneUI() {
-            override fun createDefaultDivider(): BasicSplitPaneDivider {
-                return object : BasicSplitPaneDivider(this) {
-                    override fun setBorder(b: Border) {}
+        try {
+            splitPane.border = BorderFactory.createEmptyBorder(1, 1, 1, 1)
+            val flatDividerSplitPaneUI = object : BasicSplitPaneUI() {
+                override fun createDefaultDivider(): BasicSplitPaneDivider {
+                    return object : BasicSplitPaneDivider(this) {
+                        override fun setBorder(b: Border) {}
+                    }
                 }
             }
+            splitPane.ui = flatDividerSplitPaneUI
+            splitPane.border = BorderFactory.createEmptyBorder()
+        } catch(ignore: Exception) {
+        } finally {
         }
-        splitPane.ui = flatDividerSplitPaneUI
-        splitPane.border = BorderFactory.createEmptyBorder()
     }
 
 }
