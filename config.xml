@@ -1,0 +1,28 @@
+<config>
+    <commonDep>    
+            <groupId>com.nd.sdp.android.common</groupId>
+            <artifactId>res</artifactId>
+            <version>0.2.6-release</version>
+    </commonDep>
+    <widgets>
+        <widget>
+            <name>Button</name>
+            <dependency>
+            </dependency>
+            <repository>http://git.sdp.nd/component-android/sdp-common-res</repository>
+            <category>Button</category>
+            <readme>默认按钮</readme>
+            <defaultType>xml</defaultType>
+            <more></more>
+            <image>http://git.sdp.nd/949177/common-ui-intellij-plugin/raw/master/images/button_1.png</image>
+            <icon></icon>
+            <xml>
+                <![CDATA[<Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="${replace}"/>]]>
+            </xml>
+            <java></java>
+        </widget>
+    </widgets>
+</config>

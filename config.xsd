@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="config" type="configType"/>
+  <xs:complexType name="commonDepType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="groupId"/>
+      <xs:element type="xs:string" name="artifactId"/>
+      <xs:element type="xs:string" name="version"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="configType">
+    <xs:sequence>
+      <xs:element type="commonDepType" name="commonDep"/>
+      <xs:element type="widgetsType" name="widgets"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="widgetType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="name"/>
+      <xs:element type="xs:string" name="dependency"/>
+      <xs:element type="xs:string" name="repository"/>
+      <xs:element type="xs:string" name="category"/>
+      <xs:element type="xs:string" name="readme"/>
+      <xs:element type="xs:string" name="defaultType"/>
+      <xs:element type="xs:string" name="more"/>
+      <xs:element type="xs:string" name="image"/>
+      <xs:element type="xs:string" name="icon"/>
+      <xs:element type="xs:string" name="xml"/>
+      <xs:element type="xs:string" name="java"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="widgetsType">
+    <xs:sequence>
+      <xs:element type="widgetType" name="widget"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
