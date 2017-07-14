@@ -2,8 +2,8 @@
 <idea-plugin>
   <id>com.nd.sdp.common.CustomUIToolWindow</id>
   <name>CustomUI Tool Window</name>
-  <version>1.0</version>
-  <vendor email="young91@vip.qq.com" url="http://git.sdp.nd/949177">SDP Common</vendor>
+  <version>1.0.1</version>
+  <vendor email="young91@vip.qq.com" url="https://github.com/eyyoung">SDP Common</vendor>
 
   <description><![CDATA[
       Plugin Function<br/>

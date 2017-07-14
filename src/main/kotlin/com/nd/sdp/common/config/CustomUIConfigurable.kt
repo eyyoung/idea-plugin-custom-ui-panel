@@ -38,7 +38,6 @@ class CustomUIConfigurable : SearchableConfigurable {
     }
 
     override fun disposeUIResources() {
-        super.disposeUIResources()
         customUIConfigGUI = null
     }
 

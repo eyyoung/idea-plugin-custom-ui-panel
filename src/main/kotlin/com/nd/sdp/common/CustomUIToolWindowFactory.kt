@@ -54,6 +54,7 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
     private var textPaneReadme: JTextPane? = null
     private var buttonDragToJava: JButton? = null
     private var tfFeedback: JLabel? = null
+    private var tfRefresh: JLabel? = null
     private var categoryListModel: DefaultListModel<String> = DefaultListModel()
     private val widgetMap = HashMap<String, DefaultListModel<Widget>>()
     private var mCurrentWidget: Widget? = null
@@ -72,6 +73,13 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
 //        labelRepository!!.font = font.deriveFont(attributes)
         tfFeedback!!.addMouseListener(OpenUrlAction("https://github.com/eyyoung/idea-plugin-custom-ui-panel/issues"))
         labelRepository!!.cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
+        tfRefresh!!.cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
+        tfFeedback!!.cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
+        tfRefresh!!.addMouseListener(object : MouseAdapter(){
+            override fun mouseClicked(e: MouseEvent?) {
+                initData()
+            }
+        })
         listWidget!!.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(evt: MouseEvent?) {
                 val list = evt!!.source as JList<*>
@@ -194,6 +202,8 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
         if (widgets == null) {
             return null
         }
+        categoryListModel.clear()
+        widgetMap.clear()
         categoryListModel.addElement("All")
         val allListModel = DefaultListModel<Widget>()
         widgetMap.put("All", allListModel)
