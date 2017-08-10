@@ -16,8 +16,13 @@ class Widget {
     var java: String? = null
     var defaultType: String? = null
     var dependency: Dependency? = null
+    var wiki: String? = null
 
     override fun toString(): String {
         return if (name == null) "" else name!!
+    }
+
+    fun getSearchInfo(): String {
+        return name + readme + more + category
     }
 }

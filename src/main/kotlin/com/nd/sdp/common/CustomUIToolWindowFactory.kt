@@ -1,12 +1,14 @@
 package com.nd.sdp.common
 
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationType
+import com.intellij.notification.Notifications
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.wm.IdeFocusManager
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
@@ -22,6 +24,7 @@ import com.nd.sdp.common.task.CheckGradleTask
 import com.nd.sdp.common.task.GetRealConfigTask
 import com.nd.sdp.common.utils.ValueExportTransferHandler
 import org.jdesktop.swingx.JXImageView
+import org.jdesktop.swingx.JXTextField
 import java.awt.Cursor
 import java.awt.Desktop
 import java.awt.event.MouseAdapter
@@ -33,6 +36,8 @@ import java.net.URL
 import java.util.*
 import javax.swing.*
 import javax.swing.border.Border
+import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
 import javax.swing.event.ListSelectionListener
 import javax.swing.plaf.basic.BasicSplitPaneDivider
 import javax.swing.plaf.basic.BasicSplitPaneUI
@@ -59,6 +64,8 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
     private val widgetMap = HashMap<String, DefaultListModel<Widget>>()
     private var mCurrentWidget: Widget? = null
     private var mConfig: Config? = null
+    private var tfSearch: JTextField? = null
+    private var mProject: Project? = null
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         val contentFactory = ContentFactory.SERVICE.getInstance()
@@ -68,6 +75,7 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
         flattenJSplitPane(infoSplitPane)
         listCategory!!.selectionMode = ListSelectionModel.SINGLE_INTERVAL_SELECTION
         listCategory!!.layoutOrientation = JList.VERTICAL
+        textPaneReadme!!.cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
 //        val font = labelRepository!!.font
 //        val attributes = font.attributes
 //        labelRepository!!.font = font.deriveFont(attributes)
@@ -75,13 +83,16 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
         labelRepository!!.cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
         tfRefresh!!.cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
         tfFeedback!!.cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
-        tfRefresh!!.addMouseListener(object : MouseAdapter(){
+        tfRefresh!!.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent?) {
                 initData()
             }
         })
         listWidget!!.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(evt: MouseEvent?) {
+                if (mProject == null) {
+                    return
+                }
                 val list = evt!!.source as JList<*>
                 val index = list.locationToIndex(evt.point)
                 val model = listWidget!!.model as DefaultListModel<Widget>
@@ -89,7 +100,7 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
                 if (evt.clickCount == 1) {
                     setCurrentWidget(widget)
                 } else if (evt.clickCount == 2) {
-                    val selectedTextEditor = FileEditorManager.getInstance(project).selectedTextEditor
+                    val selectedTextEditor = FileEditorManager.getInstance(mProject!!).selectedTextEditor
                     if (selectedTextEditor != null) {
                         val document = selectedTextEditor.document
                         val file = FileDocumentManager.getInstance().getFile(document)
@@ -98,13 +109,19 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
                             val code: String?
                             if ("xml" == widget.defaultType) {
                                 if ("XML" != fileTypeUpperCase) {
-                                    Messages.showInfoMessage("请确保打开的文件是XML", "错误")
+                                    Notifications.Bus.notify(Notification("Custom UI Panel",
+                                            "文件类型错误",
+                                            "请确保打开的是XML文件",
+                                            NotificationType.ERROR))
                                     return
                                 }
                                 code = widget.xml
                             } else {
                                 if ("JAVA" != fileTypeUpperCase) {
-                                    Messages.showInfoMessage("请确保打开的文件是Java", "错误")
+                                    Notifications.Bus.notify(Notification("Custom UI Panel",
+                                            "文件类型错误",
+                                            "请确保打开的是请确保打开的文件是Java文件",
+                                            NotificationType.ERROR))
                                     return
                                 }
                                 code = widget.java
@@ -115,7 +132,7 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
                             val selectionModel = selectedTextEditor.selectionModel
                             val selectionStart = selectionModel.selectionStart
                             val finalCode = code
-                            WriteCommandAction.runWriteCommandAction(project) {
+                            WriteCommandAction.runWriteCommandAction(mProject!!) {
                                 document.replaceString(selectionStart, selectionStart, finalCode)
                                 val replaceIndex = finalCode.indexOf("\${replace}")
                                 if (replaceIndex == -1) {
@@ -124,7 +141,7 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
                                 selectionModel.removeSelection()
                                 selectionModel.setSelection(selectionStart + replaceIndex, selectionStart + replaceIndex + 10)
                                 selectedTextEditor.caretModel.moveToOffset(selectionStart + replaceIndex)
-                                IdeFocusManager.getInstance(project).requestFocus(selectedTextEditor.contentComponent, true)
+                                IdeFocusManager.getInstance(mProject!!).requestFocus(selectedTextEditor.contentComponent, true)
                                 val manager = PsiDocumentManager.getInstance(project)
                                 manager.commitDocument(document)
                                 UIUtil.invokeAndWaitIfNeeded(Runnable {
@@ -132,7 +149,7 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
                                     CodeStyleManager.getInstance(project).reformat(psiFile!!)
                                 })
                             }
-                            checkDependency(widget, project, selectedTextEditor, mConfig)
+                            checkDependency(widget, mProject!!, selectedTextEditor, mConfig)
                         }
                     }
                 }
@@ -146,11 +163,63 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
                 val button = e!!.source as JButton
                 val handle = button.transferHandler
                 handle.exportAsDrag(button, e, TransferHandler.COPY)
-                checkDependency(mCurrentWidget!!, project, FileEditorManager.getInstance(project).selectedTextEditor, mConfig)
+                checkDependency(mCurrentWidget!!, mProject!!, FileEditorManager.getInstance(mProject!!).selectedTextEditor, mConfig)
             }
         })
+        initSearch()
 
         initData()
+    }
+
+    override fun shouldBeAvailable(project: Project): Boolean {
+        mProject = project
+        return super.shouldBeAvailable(project)
+    }
+
+    private fun initSearch() {
+        val document = tfSearch!!.document
+        document.addDocumentListener(object : DocumentListener {
+            override fun changedUpdate(e: DocumentEvent?) {
+            }
+
+            override fun insertUpdate(e: DocumentEvent?) {
+                val text = tfSearch!!.text
+                updateSearchResult(text)
+            }
+
+            private fun updateSearchResult(text: String) {
+                val allWidgets = widgetMap["All"]
+                if (text.isEmpty()) {
+                    listCategory!!.selectedIndex = 0
+                    listWidget!!.model = allWidgets
+                    listWidget!!.selectedIndex = 0
+                    setCurrentWidget(allWidgets!!.get(0))
+                    return
+                }
+                val size = allWidgets!!.size
+                val results = DefaultListModel<Widget>()
+                for (i in 0..size - 1) {
+                    val widget = allWidgets.get(i)
+                    val searchInfo = widget.getSearchInfo()
+                    if (searchInfo.contains(text)) {
+                        results.addElement(widget)
+                    }
+                }
+                listWidget!!.model = results
+                listWidget!!.selectedIndex = 0
+                setCurrentWidget(results.get(0))
+            }
+
+            override fun removeUpdate(e: DocumentEvent?) {
+                val text = tfSearch!!.text
+                updateSearchResult(text)
+            }
+        })
+    }
+
+    fun createUIComponents() {
+        tfSearch = JXTextField()
+        (tfSearch!! as JXTextField).prompt = "搜索"
     }
 
     private fun checkDependency(widget: Widget, project: Project, selectedTextEditor: Editor?, config: Config?) {
@@ -165,6 +234,8 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
             ProgressManager.getInstance().executeNonCancelableSection(CheckGradleTask(widget.dependency!!, project, selectedTextEditor!!))
         }
     }
+
+    private var openWikiAction: OpenUrlAction? = null
 
     private fun setCurrentWidget(widget: Widget) {
         mCurrentWidget = widget
@@ -183,6 +254,11 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
 
         textPaneReadme!!.text = mCurrentWidget!!.readme
         labelRepository!!.text = "<html><font><u>${mCurrentWidget!!.repository}</u></font></html>"
+        if (openWikiAction != null) {
+            textPaneReadme!!.removeMouseListener(openWikiAction)
+        }
+        openWikiAction = OpenUrlAction(mCurrentWidget!!.wiki)
+        textPaneReadme!!.addMouseListener(openWikiAction)
         val mouseListeners = labelRepository!!.mouseListeners
         if (mouseListeners.isNotEmpty()) {
             labelRepository!!.removeMouseListener(mouseListeners[0])
@@ -231,6 +307,8 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
                 val s = categoryListModel.get(index)
                 val widgetDefaultListModel = widgetMap[s]
                 listWidget!!.model = widgetDefaultListModel
+                listWidget!!.selectedIndex = 0
+                setCurrentWidget(widgetDefaultListModel!!.get(0))
             }
         })
         return null
@@ -239,6 +317,9 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
     private class OpenUrlAction internal constructor(private val url: String?) : MouseListener {
 
         override fun mouseClicked(e: MouseEvent) {
+            if (url!!.isEmpty()) {
+                return
+            }
             if (Desktop.isDesktopSupported()) {
                 try {
                     Desktop.getDesktop().browse(URI.create(url))

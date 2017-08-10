@@ -10,6 +10,7 @@
             <dependency>
             </dependency>
             <repository>http://git.sdp.nd/component-android/sdp-common-res</repository>
+            <wiki></wiki>
             <category>Button</category>
             <readme>默认按钮</readme>
             <defaultType>xml</defaultType>
