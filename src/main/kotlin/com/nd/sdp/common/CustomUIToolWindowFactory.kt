@@ -65,7 +65,6 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
     private var mCurrentWidget: Widget? = null
     private var mConfig: Config? = null
     private var tfSearch: JTextField? = null
-    private var mProject: Project? = null
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         val contentFactory = ContentFactory.SERVICE.getInstance()
@@ -90,7 +89,7 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
         })
         listWidget!!.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(evt: MouseEvent?) {
-                if (mProject == null) {
+                if (project.isDisposed) {
                     return
                 }
                 val list = evt!!.source as JList<*>
@@ -100,7 +99,7 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
                 if (evt.clickCount == 1) {
                     setCurrentWidget(widget)
                 } else if (evt.clickCount == 2) {
-                    val selectedTextEditor = FileEditorManager.getInstance(mProject!!).selectedTextEditor
+                    val selectedTextEditor = FileEditorManager.getInstance(project).selectedTextEditor
                     if (selectedTextEditor != null) {
                         val document = selectedTextEditor.document
                         val file = FileDocumentManager.getInstance().getFile(document)
@@ -132,7 +131,7 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
                             val selectionModel = selectedTextEditor.selectionModel
                             val selectionStart = selectionModel.selectionStart
                             val finalCode = code
-                            WriteCommandAction.runWriteCommandAction(mProject!!) {
+                            WriteCommandAction.runWriteCommandAction(project) {
                                 document.replaceString(selectionStart, selectionStart, finalCode)
                                 val replaceIndex = finalCode.indexOf("\${replace}")
                                 if (replaceIndex == -1) {
@@ -141,7 +140,7 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
                                 selectionModel.removeSelection()
                                 selectionModel.setSelection(selectionStart + replaceIndex, selectionStart + replaceIndex + 10)
                                 selectedTextEditor.caretModel.moveToOffset(selectionStart + replaceIndex)
-                                IdeFocusManager.getInstance(mProject!!).requestFocus(selectedTextEditor.contentComponent, true)
+                                IdeFocusManager.getInstance(project).requestFocus(selectedTextEditor.contentComponent, true)
                                 val manager = PsiDocumentManager.getInstance(project)
                                 manager.commitDocument(document)
                                 UIUtil.invokeAndWaitIfNeeded(Runnable {
@@ -149,7 +148,7 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
                                     CodeStyleManager.getInstance(project).reformat(psiFile!!)
                                 })
                             }
-                            checkDependency(widget, mProject!!, selectedTextEditor, mConfig)
+                            checkDependency(widget, project, selectedTextEditor, mConfig)
                         }
                     }
                 }
@@ -157,23 +156,21 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
         })
         buttonDragToXML!!.addMouseMotionListener(object : MouseAdapter() {
             override fun mouseDragged(e: MouseEvent?) {
+                if (project.isDisposed) {
+                    return
+                }
                 if (mCurrentWidget == null) {
                     return
                 }
                 val button = e!!.source as JButton
                 val handle = button.transferHandler
                 handle.exportAsDrag(button, e, TransferHandler.COPY)
-                checkDependency(mCurrentWidget!!, mProject!!, FileEditorManager.getInstance(mProject!!).selectedTextEditor, mConfig)
+                checkDependency(mCurrentWidget!!, project, FileEditorManager.getInstance(project).selectedTextEditor, mConfig)
             }
         })
         initSearch()
 
         initData()
-    }
-
-    override fun shouldBeAvailable(project: Project): Boolean {
-        mProject = project
-        return super.shouldBeAvailable(project)
     }
 
     private fun initSearch() {
@@ -207,6 +204,9 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
                 }
                 listWidget!!.model = results
                 listWidget!!.selectedIndex = 0
+                if(results.isEmpty){
+                    return
+                }
                 setCurrentWidget(results.get(0))
             }
 

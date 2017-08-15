@@ -2,7 +2,7 @@
 <idea-plugin>
   <id>com.nd.sdp.common.CustomUIToolWindow</id>
   <name>CustomUI Tool Window</name>
-  <version>1.0.3</version>
+  <version>1.0.5</version>
   <vendor email="young91@vip.qq.com" url="https://github.com/eyyoung">SDP Common</vendor>
 
   <description><![CDATA[
