@@ -66,6 +66,10 @@ The name suppose to display in the plugin
 
 The Gradle dependency of this widget to use,when node is null,use commonDep node
 
+- dependencies
+
+Support multiple dependency
+
 - repository
 
 The widget maintain by which repo
@@ -81,6 +85,10 @@ The simple introduce
 - image
 
 The image which will show on the plugin when widge is selected
+
+- imageWiki
+
+The open url when click image
 
 - xml
 

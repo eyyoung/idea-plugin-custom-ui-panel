@@ -35,7 +35,7 @@ if (JavaVersion.current().isJava8Compatible()) {
 
 
 group 'com.nd.sdp.common'
-project.version = '1.0.5'
+project.version = '1.0.6'
 
 repositories {
     maven { url 'http://nexus.sdp.nd/nexus/content/groups/android-public/' }

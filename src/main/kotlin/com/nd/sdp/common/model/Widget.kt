@@ -11,12 +11,14 @@ class Widget {
     var readme: String? = null
     var more: String? = null
     var image: String? = null
+    var imageWiki: String? = null
     var category: String? = null
     var xml: String? = null
     var java: String? = null
     var defaultType: String? = null
     var dependency: Dependency? = null
     var wiki: String? = null
+    var dependencies: Dependencies? = null
 
     override fun toString(): String {
         return if (name == null) "" else name!!

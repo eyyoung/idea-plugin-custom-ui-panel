@@ -1,21 +1,33 @@
 <config>
-    <commonDep>    
-            <groupId>com.nd.sdp.android.common</groupId>
-            <artifactId>res</artifactId>
-            <version>0.2.6-release</version>
+    <commonDep>
+        <groupId>com.nd.sdp.android.common</groupId>
+        <artifactId>res</artifactId>
+        <version>0.2.6-release</version>
     </commonDep>
     <widgets>
         <widget>
             <name>Button</name>
             <dependency>
             </dependency>
+            <dependencies>
+                <dependency>
+                    <groupId>com.nd.sdp.android.common</groupId>
+                    <artifactId>res-test</artifactId>
+                    <version>0.2.6-release</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.nd.sdp.android.common</groupId>
+                    <artifactId>res-test2</artifactId>
+                    <version>0.2.6-release</version>
+                </dependency>
+            </dependencies>
             <repository>http://git.sdp.nd/component-android/sdp-common-res</repository>
-            <wiki></wiki>
             <category>Button</category>
             <readme>默认按钮</readme>
             <defaultType>xml</defaultType>
             <more></more>
             <image>http://git.sdp.nd/949177/common-ui-intellij-plugin/raw/master/images/button_1.png</image>
+            <imageWiki>http://cube.nd.com.cn/im_design/components/button.html</imageWiki>
             <icon></icon>
             <xml>
                 <![CDATA[<Button

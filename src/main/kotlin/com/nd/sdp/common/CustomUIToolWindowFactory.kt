@@ -21,6 +21,7 @@ import com.nd.sdp.common.model.Config
 import com.nd.sdp.common.model.Widget
 import com.nd.sdp.common.task.Callback
 import com.nd.sdp.common.task.CheckGradleTask
+import com.nd.sdp.common.task.GetMockConfigTask
 import com.nd.sdp.common.task.GetRealConfigTask
 import com.nd.sdp.common.utils.ValueExportTransferHandler
 import org.jdesktop.swingx.JXImageView
@@ -204,7 +205,7 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
                 }
                 listWidget!!.model = results
                 listWidget!!.selectedIndex = 0
-                if(results.isEmpty){
+                if (results.isEmpty) {
                     return
                 }
                 setCurrentWidget(results.get(0))
@@ -224,14 +225,20 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
 
     private fun checkDependency(widget: Widget, project: Project, selectedTextEditor: Editor?, config: Config?) {
         WriteCommandAction.runWriteCommandAction(project) {
-            if (widget.dependency?.groupId?.isEmpty() ?: true || widget.dependency?.artifactId?.isEmpty() ?: true || widget.dependency?.version?.isEmpty() ?: true) {
-                if (config?.commonDep == null) {
+            if (widget.dependencies == null || widget.dependencies!!.dependency == null || widget.dependencies?.dependency?.isEmpty() ?: true) {
+                if (widget.dependency?.groupId?.isEmpty() ?: true || widget.dependency?.artifactId?.isEmpty() ?: true || widget.dependency?.version?.isEmpty() ?: true) {
+                    if (config?.commonDep == null) {
+                        return@runWriteCommandAction
+                    }
+                    ProgressManager.getInstance().executeNonCancelableSection(CheckGradleTask(config.commonDep!!, project, selectedTextEditor!!))
                     return@runWriteCommandAction
                 }
-                ProgressManager.getInstance().executeNonCancelableSection(CheckGradleTask(config.commonDep!!, project, selectedTextEditor!!))
-                return@runWriteCommandAction
+                ProgressManager.getInstance().executeNonCancelableSection(CheckGradleTask(widget.dependency!!, project, selectedTextEditor!!))
+            } else {
+                for (dependency in widget.dependencies!!.dependency!!) {
+                    ProgressManager.getInstance().executeNonCancelableSection(CheckGradleTask(dependency, project, selectedTextEditor!!))
+                }
             }
-            ProgressManager.getInstance().executeNonCancelableSection(CheckGradleTask(widget.dependency!!, project, selectedTextEditor!!))
         }
     }
 
@@ -248,6 +255,7 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
         try {
             jxImageView.setImage(URL(widget.image!!))
             previewPane!!.add(jxImageView)
+            jxImageView.addMouseListener(OpenUrlAction(widget.imageWiki))
         } catch (e: IOException) {
             e.printStackTrace()
         }
@@ -267,7 +275,7 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
     }
 
     private fun initData() {
-        val getMockConfigTask = GetRealConfigTask(Callback { config ->
+        val getMockConfigTask = GetMockConfigTask(Callback { config ->
             mConfig = config;
             afterGetConfig(config?.widgets?.widget)
         })
