@@ -31,7 +31,7 @@ class CustomUIConfig : PersistentStateComponent<CustomUIConfig> {
 
     companion object {
 
-        private val DEFAULT_CONFIG = "http://git.sdp.nd/949177/nd-android-ui-panel-config/raw/master/config.xml"
+        private val DEFAULT_CONFIG = "http://git.sdp.nd/common-ui/ui-panel-config/raw/master/config.xml"
 
         val instance: CustomUIConfig
             get() = ServiceManager.getService(CustomUIConfig::class.java)

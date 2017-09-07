@@ -275,7 +275,7 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
     }
 
     private fun initData() {
-        val getMockConfigTask = GetMockConfigTask(Callback { config ->
+        val getMockConfigTask = GetRealConfigTask(Callback { config ->
             mConfig = config;
             afterGetConfig(config?.widgets?.widget)
         })
