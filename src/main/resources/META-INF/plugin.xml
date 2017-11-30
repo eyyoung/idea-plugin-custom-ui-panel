@@ -32,6 +32,7 @@
     <applicationConfigurable groupId="tools" displayName="Custom UI Widget Panel" id="preferences.SingleFileExecutionConfigurable" instance="com.nd.sdp.common.config.CustomUIConfigurable" />
     <applicationService serviceInterface="com.nd.sdp.common.config.CustomUIConfig" serviceImplementation="com.nd.sdp.common.config.CustomUIConfig"/>
     <toolWindow id="CustomUI" secondary="true" icon="/icon.png" anchor="right" factoryClass="com.nd.sdp.common.CustomUIToolWindowFactory"/>
+    <completion.contributor language="XML" implementationClass="com.nd.sdp.common.codeCompletion.WidgetCodeCompletion"/>
   </extensions>
 
   <actions>
