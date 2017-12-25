@@ -169,6 +169,20 @@ class CustomUIToolWindowFactory : ToolWindowFactory {
                 checkDependency(mCurrentWidget!!, project, FileEditorManager.getInstance(project).selectedTextEditor, mConfig)
             }
         })
+        buttonDragToJava!!.addMouseMotionListener(object : MouseAdapter() {
+            override fun mouseDragged(e: MouseEvent?) {
+                if (project.isDisposed) {
+                    return
+                }
+                if (mCurrentWidget == null) {
+                    return
+                }
+                val button = e!!.source as JButton
+                val handle = button.transferHandler
+                handle.exportAsDrag(button, e, TransferHandler.COPY)
+                checkDependency(mCurrentWidget!!, project, FileEditorManager.getInstance(project).selectedTextEditor, mConfig)
+            }
+        })
         initSearch()
 
         initData()
